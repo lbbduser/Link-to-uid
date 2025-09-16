@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Facebook UID Extractor</title>
+  <style>
+    body {
+      background-color: #ffffff;
+      font-family: 'Segoe UI', sans-serif;
+      margin: 0;
+      padding: 40px;
+      display: flex;
+      justify-content: center;
+    }
+
+    .container {
+      max-width: 600px;
+      width: 100%;
+    }
+
+    h1 {
+      text-align: center;
+      color: #333;
+      margin-bottom: 30px;
+    }
+
+    textarea, .results-box {
+      width: 100%;
+      box-sizing: border-box;
+      padding: 15px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      font-size: 16px;
+      resize: none;
+      font-family: monospace;
+    }
+
+    textarea {
+      height: 150px;
+      margin-bottom: 15px;
+    }
+
+    .results-box {
+      height: 150px;
+      overflow-y: auto;
+      background: #f9f9f9;
+      margin-bottom: 15px;
+      white-space: pre-line;
+    }
+
+    button {
+      width: 100%;
+      padding: 12px;
+      background-color: #333;
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      font-size: 16px;
+      cursor: pointer;
+      margin-bottom: 10px;
+    }
+
+    button:hover {
+      background-color: #555;
+    }
+
+    .popup {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: #fff;
+      border: 2px solid #444;
+      padding: 20px 30px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+      z-index: 9999;
+      display: none;
+      font-size: 16px;
+      border-radius: 8px;
+      text-align: center;
+    }
+
+    .popup.success {
+      border-color: #28a745;
+      color: #28a745;
+    }
+
+    .popup.error {
+      border-color: #dc3545;
+      color: #dc3545;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Facebook UID Extractor</h1>
+
+    <textarea id="inputBox" placeholder="Paste Facebook links here..."></textarea>
+    
+    <button onclick="extractUIDs()">Separate</button>
+
+    <div class="results-box" id="resultsBox" readonly></div>
+    
+    <button onclick="copyResults()">Copy All</button>
+  </div>
+
+  <div id="popup" class="popup"></div>
+
+  <script>
+    function extractUIDs() {
+      const input = document.getElementById('inputBox').value;
+      const lines = input.split('\n');
+      const uidRegex = /profile\.php\?id=(\d+)/;
+      let results = [];
+
+      for (let line of lines) {
+        const match = line.match(uidRegex);
+        if (match) {
+          results.push(match[1]);
+        }
+      }
+
+      document.getElementById('resultsBox').textContent = results.join('\n');
+    }
+
+    function copyResults() {
+      const resultBox = document.getElementById('resultsBox');
+      const text = resultBox.textContent;
+
+      if (text.trim() === '') {
+        showPopup('Nothing to copy', 'error');
+        return;
+      }
+
+      const tempTextarea = document.createElement('textarea');
+      tempTextarea.value = text;
+      document.body.appendChild(tempTextarea);
+      tempTextarea.select();
+      document.execCommand('copy');
+      document.body.removeChild(tempTextarea);
+
+      showPopup('Copied successfully!', 'success');
+    }
+
+    function showPopup(message, type) {
+      const popup = document.getElementById('popup');
+      popup.textContent = message;
+      popup.className = `popup ${type}`;
+      popup.style.display = 'block';
+
+      setTimeout(() => {
+        popup.style.display = 'none';
+      }, 2000);
+    }
+  </script>
+</body>
+</html>
